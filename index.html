@@ -1,0 +1,1197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Soul Holon</title>
+<meta name="description" content="Two animations built in beats: the soul as a holon, a whole made of wholes that lives in every expression of life, and the shift from Level 1 survival to Level 2 purpose.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap">
+<style>
+/* Layout: one dark 16:9 stage with beat controls and the beat list beneath, built to sit inside an iframe
+   on another site. Deliberately single-theme, matching the presentation it comes from. */
+:root {
+  --ink: #07080f; --panel: #10121d; --line: #262a3f; --text: #ebe8f3; --muted: #8a8ca6;
+  --instinct: #e3a446; --soul: #a9dcff; --violet: #9b8cff;
+  --f-display: "Marcellus", "Palatino Linotype", Palatino, Georgia, serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; background: var(--ink); color: var(--text); }
+body { font-family: var(--f-body); font-size: 15px; line-height: 1.55; padding: clamp(12px, 2.5vw, 22px); }
+.wrap { max-width: 1200px; margin: 0 auto; display: grid; gap: 16px; }
+header { display: grid; gap: 4px; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0; }
+h1 { font-family: var(--f-display); font-weight: 400; font-size: clamp(26px, 4vw, 38px); line-height: 1.1; margin: 0; text-wrap: balance; }
+header p { margin: 0; color: var(--muted); max-width: 65ch; }
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+.tab { font: 500 14px/1 var(--f-body); color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 10px 16px; cursor: pointer; }
+.tab[aria-selected="true"] { color: var(--ink); background: var(--soul); border-color: var(--soul); }
+.tab:focus-visible, .btn:focus-visible, .cue:focus-visible, input:focus-visible + label { outline: 2px solid var(--violet); outline-offset: 3px; }
+.stage {
+  position: relative; width: 100%; max-width: 100%; aspect-ratio: 16 / 9; overflow: hidden; cursor: pointer;
+  background: radial-gradient(ellipse at 50% 52%, rgba(155,140,255,.08), rgba(155,140,255,0) 70%), var(--ink);
+  border: 1px solid var(--line); border-radius: 6px;
+}
+.stage:fullscreen { border: 0; border-radius: 0; }
+.stage canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+/* On small screens the captions drawn on the stage get too small to read, so the beat is shown here instead. */
+.nowcap { display: none; margin: 0; gap: 2px; }
+.nowcap .k { font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--soul); }
+.nowcap .k.warm { color: var(--instinct); }
+.nowcap .v { font-family: var(--f-display); font-size: 20px; line-height: 1.3; }
+@media (max-width: 700px) { .nowcap { display: grid; } .nowcap[hidden] { display: none; } }
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.btn { font: 500 14px/1 var(--f-body); color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px; cursor: pointer; }
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--soul); color: var(--ink); border-color: var(--soul); }
+.btn:disabled { opacity: .4; cursor: default; }
+.spacer { flex: 1 1 auto; }
+.toggle { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 14px; }
+.toggle input { accent-color: var(--soul); width: 16px; height: 16px; margin: 0; }
+.hint { font-family: var(--f-mono); font-size: 12px; color: var(--muted); margin: 0; }
+@media (max-width: 700px) { .hint, .spacer { display: none; } }
+.cues { display: grid; gap: 8px; }
+.cues h2 { font-family: var(--f-mono); font-weight: 500; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0; }
+.cue-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
+.cue { text-align: left; display: grid; gap: 4px; min-width: 0; align-content: start; background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; cursor: pointer; font: inherit; }
+.cue .k { font-family: var(--f-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.cue .v { font-size: 14px; line-height: 1.4; }
+.cue[aria-current="step"] { border-color: var(--soul); }
+.cue[aria-current="step"] .k { color: var(--soul); }
+@media (max-width: 700px) { .cue { padding: 9px 12px; } .cue .v { font-size: 13.5px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Our Mystic Journeys · a model of the soul</p>
+    <h1>The Soul Holon</h1>
+    <p>Two short animations built in beats. Click the stage or press Next beat to advance.</p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Animation">
+    <button class="tab" role="tab" aria-selected="true" data-scene="soul">The soul holon</button>
+    <button class="tab" role="tab" aria-selected="false" data-scene="levels">Level 1 → Level 2</button>
+  </div>
+
+  <div class="stage" id="stage">
+    <canvas id="stars" aria-hidden="true"></canvas>
+    <canvas id="cv" role="img" aria-label="Animation stage. The current beat is described in the beat list below."></canvas>
+  </div>
+  <p class="nowcap" id="nowcap" aria-live="polite"><span class="k" id="nowcap-k"></span><span class="v" id="nowcap-v"></span></p>
+
+  <div class="controls">
+    <button class="btn" id="back">Back</button>
+    <button class="btn primary" id="next">Next beat</button>
+    <button class="btn" id="restart">Restart</button>
+    <button class="btn" id="playall">Play all</button>
+    <span class="spacer"></span>
+    <span class="toggle"><input type="checkbox" id="captions" checked><label for="captions">Captions</label></span>
+    <button class="btn" id="fs">Full screen</button>
+  </div>
+  <p class="hint">→ / Space: next beat · ←: back · R: restart · F: full screen · 1 / 2: switch animation</p>
+
+  <section class="cues">
+    <h2>Beats</h2>
+    <div class="cue-list" id="cues"></div>
+  </section>
+</div>
+
+<script>
+/* ---- scenes.js from "Are We Ready for Open Contact", soul scene swapped for the holon version (build-pages.py) ---- */
+/* Canvas animation scenes. Each scene is authored on a 1600x900 logical canvas
+   and advances through "marks": beat k plays the timeline up to marks[k]. */
+(function () {
+  const C = { ink: "#07080f", text: "#ebe8f3", muted: "#8a8ca6", instinct: "#e3a446", soul: "#a9dcff", violet: "#9b8cff" };
+  const F = { display: '"Marcellus", "Palatino Linotype", Georgia, serif', mono: '"IBM Plex Mono", Consolas, monospace' };
+  const W = 1600, H = 900;
+  let ctx = null;
+  let captionsOn = true;
+
+  const hexA = (hex, a) => {
+    const n = parseInt(hex.replace("#", ""), 16);
+    return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${Math.max(0, Math.min(1, a))})`;
+  };
+  const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+  const ease = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+  const seg = (t, a, b) => ease(clamp((t - a) / (b - a)));
+  const lerp = (a, b, p) => a + (b - a) * p;
+  const setSpacing = px => { if ("letterSpacing" in ctx) ctx.letterSpacing = px + "px"; };
+
+  let seed = 11;
+  const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  const motes = Array.from({ length: 38 }, () => ({ x: 60 + rnd() * (W - 120), y: 560 + rnd() * 300, ph: rnd() * 6.3 }));
+
+  function drawOrb(x, y, r, a, warm) {
+    if (a <= 0.001) return;
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+    const g = ctx.createRadialGradient(x, y, 0, x, y, r * 2.4);
+    if (warm) {
+      g.addColorStop(0, hexA("#fff2d6", .9 * a));
+      g.addColorStop(.25, hexA(C.instinct, .55 * a));
+      g.addColorStop(1, hexA(C.instinct, 0));
+    } else {
+      g.addColorStop(0, `rgba(255,255,255,${clamp(.95 * a)})`);
+      g.addColorStop(.18, hexA(C.soul, .75 * a));
+      g.addColorStop(.45, hexA(C.violet, .3 * a));
+      g.addColorStop(1, hexA(C.violet, 0));
+    }
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x, y, r * 2.4, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+    if (!warm) {
+      ctx.strokeStyle = hexA(C.soul, .5 * a);
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.stroke();
+    }
+  }
+
+  function drawNeck(a, b, r, q, alpha) {
+    if (q >= 1 || alpha <= 0) return;
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+    ctx.strokeStyle = hexA(C.soul, .42 * alpha * (1 - q));
+    ctx.lineCap = "round";
+    ctx.lineWidth = Math.max(0.5, r * 1.5 * (1 - q));
+    ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawPerson(x, y, s, a, col, lw = 2.2) {
+    if (a <= 0.001) return;
+    ctx.save();
+    ctx.globalAlpha = a;
+    ctx.strokeStyle = col; ctx.fillStyle = C.ink; ctx.lineWidth = lw;
+    ctx.beginPath(); ctx.arc(x, y - 38 * s, 12.5 * s, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    const w = 21 * s, top = y - 20 * s, bot = y + 40 * s;
+    ctx.beginPath();
+    ctx.moveTo(x - w, bot);
+    ctx.lineTo(x - w, top + 14 * s);
+    ctx.quadraticCurveTo(x - w, top, x - w + 14 * s, top);
+    ctx.lineTo(x + w - 14 * s, top);
+    ctx.quadraticCurveTo(x + w, top, x + w, top + 14 * s);
+    ctx.lineTo(x + w, bot);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    ctx.restore();
+  }
+
+  function pill(text, x, y, color, a, align = "center", size = 17) {
+    if (a <= 0.001) return;
+    ctx.save();
+    ctx.globalAlpha = a;
+    ctx.font = `500 ${size}px ${F.mono}`;
+    setSpacing(2.5);
+    const w = ctx.measureText(text).width + 22;
+    const x0 = align === "center" ? x - w / 2 : align === "right" ? x - w : x;
+    ctx.fillStyle = C.ink;
+    ctx.strokeStyle = hexA(color, .55);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(x0, y - size, w, size * 2, size); else ctx.rect(x0, y - size, w, size * 2);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = color;
+    ctx.textAlign = "left"; ctx.textBaseline = "middle";
+    ctx.fillText(text, x0 + 12, y + 1);
+    ctx.restore();
+  }
+
+  function label(text, x, y, color, a, align = "center", size = 15) {
+    if (a <= 0.001) return;
+    ctx.save();
+    ctx.globalAlpha = a;
+    ctx.font = `400 ${size}px ${F.mono}`;
+    setSpacing(2);
+    ctx.fillStyle = color;
+    ctx.textAlign = align; ctx.textBaseline = "middle";
+    ctx.fillText(text, x, y);
+    ctx.restore();
+  }
+
+  function wrap(text, x, y, maxW, lh) {
+    const words = text.split(" ");
+    let line = "", yy = y;
+    for (const w of words) {
+      const test = line ? line + " " + w : w;
+      if (ctx.measureText(test).width > maxW && line) { ctx.fillText(line, x, yy); line = w; yy += lh; }
+      else line = test;
+    }
+    if (line) ctx.fillText(line, x, yy);
+  }
+
+  function caption(scene, t) {
+    if (!captionsOn) return;
+    const marks = scene.marks;
+    let i = marks.findIndex(m => t <= m + 0.001);
+    if (i < 0) i = marks.length - 1;
+    const start = i === 0 ? 0 : marks[i - 1];
+    const a = i === 0 ? 1 : seg(t, start, start + 0.8);
+    const c = scene.beats[i];
+    ctx.save();
+    ctx.globalAlpha = a;
+    ctx.font = `500 17px ${F.mono}`;
+    setSpacing(3);
+    ctx.fillStyle = c.warm ? C.instinct : C.soul;
+    ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+    ctx.fillText(c.k.toUpperCase(), 64, 76);
+    setSpacing(0);
+    ctx.font = `400 38px ${F.display}`;
+    ctx.fillStyle = C.text;
+    wrap(c.v, 64, 124, 600, 46);
+    ctx.restore();
+  }
+
+  function icon(kind, x, y, a) {
+    if (a <= 0.001) return;
+    if (kind === "human") { drawPerson(x, y + 6, .8, a, C.text, 2.4); return; }
+    ctx.save();
+    ctx.globalAlpha = a;
+    ctx.strokeStyle = C.text; ctx.fillStyle = C.ink; ctx.lineWidth = 2.4;
+    ctx.lineJoin = "round"; ctx.lineCap = "round";
+    ctx.beginPath();
+    switch (kind) {
+      case "animal":
+        ctx.ellipse(x - 4, y, 22, 11, 0, 0, Math.PI * 2);
+        ctx.moveTo(x + 14, y - 6); ctx.lineTo(x + 30, y - 14); ctx.lineTo(x + 26, y - 24); ctx.lineTo(x + 22, y - 15);
+        ctx.moveTo(x + 30, y - 14); ctx.lineTo(x + 36, y - 6); ctx.lineTo(x + 18, y - 2);
+        ctx.moveTo(x - 18, y + 8); ctx.lineTo(x - 20, y + 26);
+        ctx.moveTo(x - 6, y + 10); ctx.lineTo(x - 6, y + 26);
+        ctx.moveTo(x + 6, y + 10); ctx.lineTo(x + 6, y + 26);
+        ctx.moveTo(x + 14, y + 7); ctx.lineTo(x + 16, y + 26);
+        ctx.moveTo(x - 25, y - 2); ctx.quadraticCurveTo(x - 40, y - 4, x - 42, y + 12);
+        ctx.fill(); ctx.stroke(); break;
+      case "bird":
+        ctx.moveTo(x - 30, y - 2); ctx.quadraticCurveTo(x - 14, y - 22, x, y + 2);
+        ctx.quadraticCurveTo(x + 14, y - 22, x + 30, y - 2);
+        ctx.stroke(); break;
+      case "fish":
+        ctx.ellipse(x - 6, y, 20, 11, 0, 0, Math.PI * 2);
+        ctx.moveTo(x + 12, y); ctx.lineTo(x + 28, y - 11); ctx.lineTo(x + 28, y + 11); ctx.closePath();
+        ctx.fill(); ctx.stroke();
+        ctx.fillStyle = C.text; ctx.beginPath(); ctx.arc(x - 16, y - 3, 2.2, 0, Math.PI * 2); ctx.fill(); break;
+      case "cloud":
+        ctx.moveTo(x - 28, y + 12);
+        ctx.arc(x - 16, y + 2, 11, Math.PI * .6, Math.PI * 1.55);
+        ctx.arc(x + 1, y - 6, 15, Math.PI * 1.1, Math.PI * 1.95);
+        ctx.arc(x + 18, y + 3, 10, Math.PI * 1.45, Math.PI * .35);
+        ctx.closePath(); ctx.fill(); ctx.stroke(); break;
+      case "stone":
+        ctx.moveTo(x - 26, y + 14); ctx.lineTo(x - 20, y - 6); ctx.lineTo(x - 4, y - 16); ctx.lineTo(x + 16, y - 10);
+        ctx.lineTo(x + 26, y + 6); ctx.lineTo(x + 18, y + 14); ctx.closePath(); ctx.fill(); ctx.stroke(); break;
+      case "star":
+        for (let i = 0; i < 10; i++) {
+          const r = i % 2 ? 10 : 24, ang = -Math.PI / 2 + i * Math.PI / 5;
+          const px = x + Math.cos(ang) * r, py = y + Math.sin(ang) * r;
+          i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+        }
+        ctx.closePath(); ctx.fill(); ctx.stroke(); break;
+      case "alien":
+        ctx.moveTo(x, y + 24);
+        ctx.bezierCurveTo(x - 30, y + 2, x - 22, y - 26, x, y - 26);
+        ctx.bezierCurveTo(x + 22, y - 26, x + 30, y + 2, x, y + 24);
+        ctx.fill(); ctx.stroke();
+        ctx.fillStyle = C.text;
+        ctx.beginPath(); ctx.ellipse(x - 9, y - 4, 7, 3.5, .5, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(x + 9, y - 4, 7, 3.5, -.5, 0, Math.PI * 2); ctx.fill(); break;
+      case "planet":
+        ctx.ellipse(x, y, 30, 8, -.28, Math.PI, Math.PI * 2); ctx.stroke();          // back of the ring
+        ctx.beginPath(); ctx.arc(x, y, 15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(x, y, 30, 8, -.28, 0, Math.PI); ctx.stroke(); break; // front of the ring
+      case "galaxy":
+        for (let arm = 0; arm < 2; arm++) {
+          ctx.moveTo(x, y);
+          for (let s = 1; s <= 30; s++) {
+            const th = s * .2 + arm * Math.PI, r = s * .9;
+            ctx.lineTo(x + Math.cos(th) * r, y + Math.sin(th) * r * .62);
+          }
+        }
+        ctx.stroke();
+        ctx.fillStyle = C.text; ctx.beginPath(); ctx.arc(x, y, 3.2, 0, Math.PI * 2); ctx.fill(); break;
+    }
+    ctx.restore();
+  }
+
+  // ---------- Level 1 / Level 2 ----------
+  const RINGS = [[230, 150], [340, 205], [450, 260], [565, 315], [700, 372]];
+  const RING_LABELS = ["PURPOSE", "FAMILY", "COMMUNITY", "SOCIETY", "PLANET"];
+  const deg = d => d * Math.PI / 180;
+  const onRing = (k, d, cx, cy) => [cx + RINGS[k][0] * Math.cos(deg(d)), cy + RINGS[k][1] * Math.sin(deg(d))];
+  const FAMILY = [118, 62, 150];
+  const COMMUNITY = [95, 75, 128, 48, 160, 20, 185, 352];
+  const SOCIETY = Array.from({ length: 30 }, (_, i) => i * 12).filter(d => d < 230 || d > 310);
+
+  function levels(t, now) {
+    const cx = 800, cy = 500, hy = cy + 2;
+    const fig = seg(t, 0, 1);
+    const l1 = seg(t, .5, 2);
+    const spark = seg(t, 4, 6.2);
+    const dim = seg(t, 5.2, 7.4);
+    const rp = RINGS.map((_, k) => seg(t, 8.4 + k * 1.15, 9.6 + k * 1.15));
+    const lp = RINGS.map((_, k) => seg(t, 9 + k * 1.15, 9.9 + k * 1.15));
+
+    RINGS.forEach(([rx, ry], k) => {
+      const p = rp[k]; if (p <= 0) return;
+      ctx.save();
+      ctx.strokeStyle = hexA(C.soul, .5 - k * .05);
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, rx, ry, 0, -Math.PI / 2 - Math.PI * p, -Math.PI / 2 + Math.PI * p);
+      ctx.stroke();
+      ctx.restore();
+    });
+
+    const conn = (pts, k, a) => {
+      if (a <= 0) return;
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
+      ctx.strokeStyle = hexA(C.soul, .18 * a);
+      ctx.lineWidth = 1;
+      pts.forEach((d, j) => {
+        const [x, y] = onRing(k, d, cx, cy);
+        const tx = x, ty = y - 6, dx = tx - cx, dy = ty - hy, L = Math.hypot(dx, dy) || 1;
+        ctx.beginPath();
+        for (let s = 0; s <= 30; s++) {
+          const u = s / 30, w = 6 * Math.sin(u * 14 + j * 2.1) * Math.sin(u * Math.PI);
+          const px = cx + dx * u - dy / L * w, py = hy + dy * u + dx / L * w;
+          s ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+        }
+        ctx.stroke();
+      });
+      ctx.restore();
+    };
+    conn(FAMILY, 1, lp[1]);
+    conn(COMMUNITY, 2, lp[2]);
+
+    FAMILY.forEach(d => { const [x, y] = onRing(1, d, cx, cy); drawPerson(x, y, .55, lp[1], C.soul, 1.8); });
+    COMMUNITY.forEach(d => { const [x, y] = onRing(2, d, cx, cy); drawPerson(x, y, .45, lp[2], C.soul, 1.6); });
+    SOCIETY.forEach((d, i) => {
+      const [x, y] = onRing(3, d, cx, cy);
+      ctx.fillStyle = hexA(C.soul, lp[3] * (.55 + .3 * Math.sin(now * .002 + i)));
+      ctx.beginPath(); ctx.arc(x, y, 3.2, 0, Math.PI * 2); ctx.fill();
+    });
+    if (lp[4] > 0) {
+      const [ex, ey] = onRing(4, 152, cx, cy);
+      ctx.save();
+      ctx.globalAlpha = lp[4];
+      ctx.fillStyle = C.ink; ctx.strokeStyle = C.soul; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(ex, ey, 30, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(ex, ey, 30, 11, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(ex, ey, 12, 30, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.restore();
+      label("THE ONLY ONE WE HAVE", ex, ey + 52, C.soul, lp[4] * .9, "center", 13);
+    }
+
+    const aL1 = l1 * (1 - .55 * dim);
+    if (aL1 > 0) {
+      const R = 125, ry = cy - 5;
+      ctx.save();
+      ctx.strokeStyle = hexA(C.instinct, aL1);
+      ctx.lineWidth = 2;
+      ctx.setLineDash([7, 9]);
+      ctx.lineDashOffset = -now * .02;
+      ctx.beginPath(); ctx.arc(cx, ry, R * (0.6 + 0.4 * l1), 0, Math.PI * 2); ctx.stroke();
+      ctx.setLineDash([]);
+      const rot = now * .00025;
+      ctx.fillStyle = hexA(C.instinct, aL1 * .9);
+      for (let i = 0; i < 12; i++) {
+        const ang = rot + i * Math.PI / 6;
+        const ox = cx + Math.cos(ang) * (R - 10), oy = ry + Math.sin(ang) * (R - 10);
+        const tx = cx + Math.cos(ang) * (R - 24), ty = ry + Math.sin(ang) * (R - 24);
+        const px = -Math.sin(ang) * 5, py = Math.cos(ang) * 5;
+        ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(ox + px, oy + py); ctx.lineTo(ox - px, oy - py); ctx.closePath(); ctx.fill();
+      }
+      ctx.restore();
+      const la = l1 * (1 - .45 * dim);
+      label("SURVIVE", cx - 160, ry - 50, C.instinct, la, "right", 16);
+      label("OFFSPRING", cx + 160, ry - 50, C.instinct, la, "left", 16);
+      label("PROTECT SELF", cx, ry + 158, C.instinct, la, "center", 16);
+      pill("AUTOPILOT", cx, ry + 205, C.instinct, dim * l1 * .9, "center", 15);
+    }
+
+    drawPerson(cx, cy + 22, 1.75, fig, C.text, 2.6);
+    const beat = .5 + .5 * Math.pow(Math.sin(now * .0042), 8);
+    drawOrb(cx, hy + 18, 9 + 6 * beat, fig * (1 - spark) * .8, true);
+    const breathe = 1 + .08 * Math.sin(now * .0016);
+    // awakening: the soul/spirit sends out threads
+    const grow = seg(t, 4.6, 7.2);
+    if (grow > 0) {
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
+      ctx.strokeStyle = hexA(C.soul, .5 * grow);
+      ctx.lineWidth = 1.4; ctx.lineCap = "round";
+      for (let j = 0; j < 10; j++) {
+        const a0 = j / 10 * Math.PI * 2 + .3, len = (46 + 22 * ((j * 7) % 5) / 4) * grow;
+        let x = cx, y = hy + 18, a = a0;
+        ctx.beginPath(); ctx.moveTo(x, y);
+        for (let s = 0; s < 12; s++) { a += .18 * Math.sin(j * 3 + s); x += Math.cos(a) * len / 12; y += Math.sin(a) * len / 12; ctx.lineTo(x, y); }
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+    drawOrb(cx, hy + 18, (6 + 16 * spark) * breathe, spark, false);
+    label("SOUL / SPIRIT", cx, hy - 105, C.soul, seg(t, 5.6, 6.8) * (1 - seg(t, 8.2, 8.9)), "center", 14);
+    RINGS.forEach(([, ry], k) => pill(RING_LABELS[k], cx, cy - ry, C.soul, lp[k], "center", 15));
+  }
+
+  // ---------- The soul holon (website version; replaces "The soul spore" when build-pages.py runs) ----------
+  // A holon is a whole that is also a part. Every holon carries the same pattern as the higher self
+  // (a rosette of seven circles: one whole made of wholes), only smaller. In the last beat a larger
+  // circle appears around the higher self: it too is a part of something larger.
+  const HS = [800, 165];
+  const XS = Array.from({ length: 8 }, (_, i) => 200 + 160 * i);      // row 1: eight kinds of life
+  const XS2 = XS.map(x => x + 80);                                      // row 2: offset by half a step
+  // Sixteen landing spots, read left to right across both rows: six human lives, three NHI lives,
+  // an animal and six drawn at random from the rest of nature. Seeded, so the layout never changes.
+  const KIND_LABELS = { human: "HUMAN", alien: "NHI", animal: "ANIMAL", bird: "BIRD", fish: "FISH", cloud: "CLOUD", stone: "STONE", star: "STAR", planet: "PLANET", galaxy: "GALAXY" };
+  const SLOT_SEED = 7;
+  const SLOTS = (() => {
+    let s = SLOT_SEED;
+    const r = () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
+    const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+    const others = ["animal", ...shuffle(["bird", "fish", "cloud", "stone", "star", "planet", "galaxy"]).slice(0, 6)];
+    const pool = [...Array(6).fill("human"), ...Array(3).fill("alien"), ...others];
+    for (let tries = 0; tries < 20000; tries++) {
+      const a = shuffle(pool.slice());
+      const twin = (i, d) => i >= d && (a[i] === "human" || a[i] === "alien") && a[i - d] === a[i];
+      const diag = a.filter((k, i) => twin(i, 1)).length;
+      const ok = a.every((k, i) => !twin(i, 2))
+        && diag <= 1 && !a.some((k, i) => k === "alien" && twin(i, 1))
+        && a.filter((k, i) => k === "human" && i % 2 === 0).length === 3
+        && KIND_LABELS[a[15]].length <= 4;
+      if (ok) return a;
+    }
+    return shuffle(pool.slice());
+  })();
+  const R1Y = 640, R2Y = 768, I1Y = 690, I2Y = 812;
+  const G0 = [[800, 290]];
+  const G1 = [[480, 340], [1120, 340]];
+  const G2 = [[320, 385], [640, 385], [960, 385], [1280, 385]];
+  const G3 = XS.map(x => [x + 40, 425]);
+  const G4 = [];
+  XS.forEach((x, i) => { G4.push([x, 470]); G4.push([XS2[i], 500]); });
+  const FINAL = [];
+  XS.forEach((x, i) => { FINAL.push([x, R1Y]); FINAL.push([XS2[i], R2Y]); });
+  const lp2 = (a, b, p) => [lerp(a[0], b[0], p), lerp(a[1], b[1], p)];
+
+  function bez(p0, p2, u) {
+    const p1 = [lerp(p0[0], p2[0], .85), p0[1] + 60];
+    const v = 1 - u;
+    return [v * v * p0[0] + 2 * v * u * p1[0] + u * u * p2[0], v * v * p0[1] + 2 * v * u * p1[1] + u * u * p2[1]];
+  }
+
+  // the holon pattern: one whole made of seven wholes, drawn in dark lines over the bright core
+  function holonGlyph(x, y, r, a, rot) {
+    if (a <= .01 || r < 6) return;
+    const rr = r * .34;
+    ctx.save();
+    ctx.globalAlpha = clamp(a);
+    ctx.strokeStyle = hexA(C.ink, .7);
+    ctx.lineWidth = Math.max(.8, r * .045);
+    ctx.beginPath(); ctx.arc(x, y, rr, 0, Math.PI * 2); ctx.stroke();
+    for (let k = 0; k < 6; k++) {
+      const ang = rot + k * Math.PI / 3;
+      ctx.beginPath(); ctx.arc(x + Math.cos(ang) * rr, y + Math.sin(ang) * rr, rr, 0, Math.PI * 2); ctx.stroke();
+    }
+    ctx.restore();
+  }
+  function drawHolon(x, y, r, a, rot) { drawOrb(x, y, r, a); holonGlyph(x, y, r, a, rot); }
+
+  function split(parents, children, r0, r1, p, rot) {
+    parents.forEach((par, k) => {
+      const c1 = lp2(par, children[2 * k], p), c2 = lp2(par, children[2 * k + 1], p);
+      const r = lerp(r0, r1, p);
+      drawNeck(c1, c2, r, clamp(p / .8), 1);
+      drawHolon(c1[0], c1[1], r, 1, rot);
+      drawHolon(c2[0], c2[1], r, 1, rot);
+    });
+  }
+
+  function soul(t, now) {
+    // the common view: one whole soul, one life after another
+    const out = 1 - seg(t, 6.8, 7.6);
+    if (out > .001) {
+      const fx = [380, 627, 873, 1120], fy = 520;
+      const L = [[.6, 1.6], [2, 3], [3.4, 4.4], [4.8, 5.8]];
+      const line = seg(t, .3, 5.9);
+      ctx.save();
+      ctx.globalAlpha = out;
+      ctx.strokeStyle = hexA(C.muted, .7); ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(330, 680); ctx.lineTo(lerp(330, 1180, line), 680); ctx.stroke();
+      if (line > .98) { ctx.beginPath(); ctx.moveTo(1180, 680); ctx.lineTo(1168, 673); ctx.moveTo(1180, 680); ctx.lineTo(1168, 687); ctx.stroke(); }
+      ctx.restore();
+      label("TIME", 1210, 680, C.muted, out * line, "left", 14);
+      fx.forEach((x, i) => {
+        const appear = seg(t, L[i][0] - .5, L[i][0]);
+        const ghost = i < 3 ? seg(t, L[i + 1][0], L[i + 1][0] + .6) : 0;
+        drawPerson(x, fy, 1.4, appear * (1 - .72 * ghost) * out, C.text, 2.2);
+        label("LIFE " + (i + 1), x, fy + 112, C.muted, appear * out, "center", 14);
+      });
+      let o = [800, 175];
+      for (let i = 0; i < 4; i++) {
+        if (t < L[i][0]) break;
+        const p = seg(t, L[i][0], L[i][1]);
+        const from = i === 0 ? [800, 175] : [fx[i - 1], fy - 4];
+        const to = [fx[i], fy - 4];
+        o = [lerp(from[0], to[0], p), lerp(from[1], to[1], p) - (i ? Math.sin(p * Math.PI) * 130 : 0)];
+      }
+      drawOrb(o[0], o[1], 30, seg(t, 0, .5) * out);
+      label("THE WHOLE SOUL", o[0] + 48, o[1] - 30, C.soul, out * (1 - seg(t, 1.2, 1.8)) * seg(t, 0, .5), "left", 13);
+    }
+
+    // the holon model
+    const hsIn = seg(t, 7.6, 8.4);
+    if (hsIn <= 0) return;
+    const glyphIn = seg(t, 7.9, 9.0);
+    const bright = seg(t, 18.6, 21.6);
+    const larger = seg(t, 19.0, 20.8);
+    const breathe = 1 + .04 * Math.sin(now * .0015);
+    const rot = now * .00018;
+    const pb = seg(t, 8.4, 9.6), p1 = seg(t, 9.6, 10.6), p2 = seg(t, 10.6, 11.6), p3 = seg(t, 11.6, 12.6), p4 = seg(t, 12.6, 13.6);
+    const thr = seg(t, 14.0, 15.2);
+    const down = seg(t, 15.2, 16.8);
+    const ic = seg(t, 16.0, 17.2);
+    const ic2 = seg(t, 16.3, 17.5);
+    const rep = seg(t, 18.0, 18.8);
+    const more = seg(t, 16.0, 17.4);
+
+    // a larger whole, of which the higher self is itself a part
+    if (larger > 0) {
+      ctx.save();
+      ctx.strokeStyle = hexA(C.violet, .7 * larger);
+      ctx.lineWidth = 2;
+      ctx.setLineDash([3, 7]);
+      ctx.lineDashOffset = -now * .01;
+      ctx.beginPath(); ctx.arc(HS[0], HS[1], 112 + 18 * larger, 0, Math.PI * 2); ctx.stroke();
+      ctx.restore();
+    }
+
+    // countless other holons, everywhere
+    if (more > 0) {
+      ctx.save();
+      motes.forEach(m => {
+        const tw = .5 + .5 * Math.sin(now * .0012 + m.ph);
+        ctx.strokeStyle = hexA(C.violet, .05 * more);
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(HS[0], HS[1]); ctx.lineTo(m.x, m.y); ctx.stroke();
+        ctx.fillStyle = hexA(C.soul, (.15 + .25 * tw) * more);
+        ctx.beginPath(); ctx.arc(m.x, m.y, 2.2, 0, Math.PI * 2); ctx.fill();
+      });
+      ctx.restore();
+    }
+
+    const holons = G4.map((g, i) => lp2(g, FINAL[i], down));
+    const fr = lerp(20, 13, down);
+
+    // each holon stays connected to the whole it belongs to
+    if (thr > 0) {
+      ctx.save();
+      ctx.strokeStyle = hexA(C.soul, .38);
+      ctx.lineWidth = 1.3;
+      ctx.lineCap = "round";
+      holons.forEach(f => {
+        const n = 40;
+        ctx.beginPath();
+        for (let s = 0; s <= n * thr; s++) {
+          const [x, y] = bez(HS, f, s / n);
+          s ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+        }
+        ctx.stroke();
+      });
+      ctx.restore();
+    }
+
+    // reporting back: light travels up every thread at once
+    if (rep > 0) {
+      holons.forEach((f, i) => {
+        for (let k = 0; k < 2; k++) {
+          const u = ((now / 1000) * .38 + i * .07 + k * .5) % 1;
+          const [x, y] = bez(HS, f, 1 - u);
+          drawOrb(x, y, 4, rep * Math.sin(u * Math.PI) * .9);
+        }
+      });
+    }
+
+    const hsR = (60 + 14 * bright) * breathe;
+    drawOrb(HS[0], HS[1], hsR, hsIn * (1 + .5 * bright));
+    holonGlyph(HS[0], HS[1], hsR, hsIn * glyphIn, rot);
+    label("HIGHER SELF", HS[0] + 150, HS[1] - 12, C.soul, hsIn * .95, "left", 15);
+    label("A WHOLE OF WHOLES", HS[0] + 150, HS[1] + 12, C.muted, glyphIn * .9, "left", 13);
+    label("…AND PART OF A LARGER WHOLE", HS[0] + 150, HS[1] + 36, C.violet, larger * .95, "left", 13);
+
+    // division: each holon released is complete, carrying the same pattern, only smaller
+    if (pb > 0 && p1 === 0) {
+      const c = lp2(HS, G0[0], pb);
+      drawNeck(HS, c, lerp(60, 40, pb), clamp(pb / .8), 1);
+      drawHolon(c[0], c[1], lerp(60, 40, pb), 1, rot);
+    } else if (p1 > 0 && p2 === 0) split(G0, G1, 40, 33, p1, rot);
+    else if (p2 > 0 && p3 === 0) split(G1, G2, 33, 27, p2, rot);
+    else if (p3 > 0 && p4 === 0) split(G2, G3, 27, 23, p3, rot);
+    else if (p4 > 0 && p4 < 1) split(G3, G4, 23, 20, p4, rot);
+    else if (p4 >= 1) holons.forEach(([x, y]) => drawOrb(x, y, fr, 1));
+
+    // the lives they enter
+    SLOTS.forEach((k, j) => {
+      const row2 = j % 2 === 1, col = j >> 1;
+      const x = row2 ? XS2[col] : XS[col], y = row2 ? I2Y : I1Y, a = row2 ? ic2 : ic;
+      icon(k, x, y, a);
+      label(KIND_LABELS[k], x, y + 52, C.muted, a, "center", 13);
+    });
+    if (ic > 0) holons.forEach(([x, y]) => drawOrb(x, y, fr, ic * .6));
+    if (p4 >= 1) holons.forEach(([x, y]) => holonGlyph(x, y, fr, 1, rot));
+  }
+
+  // ---------- Fission and the chain reaction ----------
+  const NUC = (() => {
+    // particle layout for a nucleus: a packed spiral of protons and neutrons
+    const pts = [];
+    const n = 26, ga = Math.PI * (3 - Math.sqrt(5));
+    for (let i = 0; i < n; i++) {
+      const r = Math.sqrt((i + .5) / n);
+      pts.push([r * Math.cos(i * ga), r * Math.sin(i * ga), i % 2]);
+    }
+    return pts;
+  })();
+
+  function nucleus(x, y, R, a, wob, now, phase) {
+    if (a <= 0.001) return;
+    ctx.save();
+    ctx.globalAlpha = a;
+    const pr = R * .27;
+    for (const [px, py, kind] of NUC) {
+      const j = wob * Math.sin(now * .02 + px * 9 + phase);
+      const sx = 1 + wob * .35, sy = 1 - wob * .2;
+      const cx = x + px * R * .82 * sx + j, cy = y + py * R * .82 * sy;
+      const g = ctx.createRadialGradient(cx - pr * .35, cy - pr * .35, pr * .1, cx, cy, pr);
+      if (kind) { g.addColorStop(0, "#fff0d2"); g.addColorStop(1, C.instinct); }
+      else { g.addColorStop(0, "#f4f8ff"); g.addColorStop(1, "#7f8db0"); }
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(cx, cy, pr, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function neutronDot(x, y, a) {
+    if (a <= 0.001) return;
+    drawOrb(x, y, 7, a, false);
+    ctx.save();
+    ctx.globalAlpha = a;
+    ctx.fillStyle = "#f4f8ff";
+    ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function burst(x, y, r, a) {
+    if (a <= 0.001) return;
+    drawOrb(x, y, r, a, true);
+    ctx.save();
+    ctx.strokeStyle = hexA(C.instinct, .6 * a);
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(x, y, r * 1.6, 0, Math.PI * 2); ctx.stroke();
+    ctx.restore();
+  }
+
+  // chain reaction layout: generation g nuclei on rings around the first split
+  const FC = [800, 470];
+  const GEN = [];
+  (() => {
+    let s2 = 5;
+    const r2 = () => { s2 = (s2 * 16807) % 2147483647; return (s2 - 1) / 2147483646; };
+    const rings = [0, 230, 430, 640];
+    const counts = [1, 3, 9, 27];
+    const times = [0, 8.6, 9.9, 11.1];
+    let prev = [{ x: FC[0], y: FC[1], t: 4.6 }];
+    for (let g = 1; g <= 3; g++) {
+      const cur = [];
+      for (let k = 0; k < counts[g]; k++) {
+        const parent = prev[Math.floor(k / 3)];
+        const ang = (k / counts[g]) * Math.PI * 2 + g * .5 + (r2() - .5) * .25;
+        const rr = rings[g] * (0.92 + r2() * .16);
+        let x = FC[0] + Math.cos(ang) * rr * 1.25, y = FC[1] + Math.sin(ang) * rr * .78;
+        x = clamp(x, 70, W - 70); y = clamp(y, 70, H - 60);
+        if (x < 780 && y < 250) y = 250 + (y / 250) * 60;   // keep clear of the caption
+        cur.push({ x, y, t: times[g] + r2() * .35, parent, g });
+      }
+      GEN.push(...cur);
+      prev = cur;
+    }
+  })();
+
+  function fission(t, now) {
+    const [cx, cy] = FC;
+    const appear = seg(t, 0, 1);
+    const chain = seg(t, 7.5, 8.3);
+    const tHit = 4.0, tSplit = 4.6;
+
+    // the field of waiting uranium nuclei for the chain reaction
+    for (const n of GEN) {
+      const sizeR = [0, 38, 31, 25][n.g];
+      const fadeIn = chain * seg(t, 7.5 + n.g * .15, 8.3 + n.g * .15);
+      if (t < n.t) nucleus(n.x, n.y, sizeR, fadeIn * .8, 0, now, n.x);
+    }
+
+    // first nucleus
+    if (t < tSplit) {
+      const wob = seg(t, tHit, tSplit) * 1.1 + .04;
+      nucleus(cx, cy, 88, appear, wob, now, 0);
+      label("URANIUM", cx, cy + 135, C.muted, appear * (1 - seg(t, 3.6, 4.2)), "center", 15);
+    } else {
+      // two fragments fly apart, then drift away during the chain reaction
+      const p = seg(t, tSplit, 6.2);
+      const drift = seg(t, 7.5, 9.5);
+      const fadeOut = 1 - seg(t, 8.4, 9.6);
+      const b = [lerp(cx, 470, p) - drift * 120, lerp(cy, 540, p) + drift * 40];
+      const k = [lerp(cx, 1130, p) + drift * 120, lerp(cy, 400, p) - drift * 40];
+      nucleus(b[0], b[1], 66, fadeOut, .05, now, 1);
+      nucleus(k[0], k[1], 54, fadeOut, .05, now, 2);
+      label("BARIUM", b[0], b[1] + 110, C.instinct, seg(t, 5.4, 6.2) * fadeOut, "center", 15);
+      label("KRYPTON", k[0], k[1] + 100, C.instinct, seg(t, 5.4, 6.2) * fadeOut, "center", 15);
+      // spare neutrons from the first split
+      [[-.5, -1], [.15, 1], [1, -.45]].forEach(([dx, dy], i) => {
+        const q = seg(t, tSplit, 7.2);
+        const a = (1 - seg(t, 7.0, 7.6)) * (t > tSplit ? 1 : 0);
+        neutronDot(cx + dx * 260 * q, cy + dy * 200 * q, a);
+      });
+      burst(cx, cy, 30 + 90 * seg(t, tSplit, 5.6), (1 - seg(t, tSplit, 6.4)) * 1.2);
+      label("≈ 200 MILLION ELECTRON VOLTS", cx, cy - 170, C.soul, seg(t, 5.6, 6.4) * fadeOut, "center", 18);
+    }
+
+    // incoming neutron
+    if (t >= 2.3 && t < tHit + .05) {
+      const p = seg(t, 2.5, tHit);
+      neutronDot(lerp(120, cx - 70, p), lerp(cy + 40, cy, p), seg(t, 2.3, 2.7));
+      label("NEUTRON", lerp(120, cx - 70, p), cy - 30 + 40 * (1 - p), C.soul, seg(t, 2.3, 2.7) * (1 - seg(t, 3.4, 3.9)), "center", 13);
+    }
+
+    // chain reaction: neutrons travel to each nucleus, which then splits
+    for (const n of GEN) {
+      const par = n.parent;
+      const startT = n.t - 1.0;
+      if (t >= startT && t < n.t + .02) {
+        const p = seg(t, startT, n.t);
+        neutronDot(lerp(par.x, n.x, p), lerp(par.y, n.y, p), .9);
+      }
+      if (t >= n.t) {
+        const q = seg(t, n.t, n.t + .9);
+        const r = [0, 34, 27, 22][n.g];
+        burst(n.x, n.y, r + r * 2.2 * q, (1 - seg(t, n.t, n.t + 1.6)) * 1.1);
+        const fade = 1 - seg(t, n.t + .4, n.t + 1.8);
+        nucleus(n.x - 26 * q, n.y + 10 * q, r * .75, fade, 0, now, n.x);
+        nucleus(n.x + 26 * q, n.y - 10 * q, r * .62, fade, 0, now, n.y);
+      }
+    }
+
+    // the whole field heats up
+    const heat = seg(t, 11.4, 13.6);
+    if (heat > 0) {
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
+      const g = ctx.createRadialGradient(cx, cy, 20, cx, cy, 900);
+      g.addColorStop(0, hexA("#fff2d6", .55 * heat));
+      g.addColorStop(.35, hexA(C.instinct, .28 * heat));
+      g.addColorStop(1, hexA(C.instinct, 0));
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+      ctx.restore();
+    }
+  }
+
+  // ---------- The March: 300,000 years on one road ----------
+  const BODY = '"IBM Plex Sans", "Segoe UI", system-ui, sans-serif';
+  const CRIMSON = "#ff6b5a", GREEN = "#7dffb0";
+  const ERA_W = 1100, ROAD_Y = 500;
+  const MARCH_MARKS = [3, 6.5, 10, 13.5, 17, 20.5, 24.5];
+  const ERAS = [
+    { date: "300,000 years ago", title: "We appear", detail: "Homo sapiens emerges in Africa." },
+    { date: "50,000 – 10,000 years ago", title: "We spread", detail: "Humans reach every continent but Antarctica. Mammoths, giant sloths and giant kangaroos vanish as we arrive. Cause still debated." },
+    { date: "13,400 years ago", title: "The first evidence of war", detail: "Jebel Sahaba, Sudan: 41 of 61 people buried there carry wounds. Then farming begins, and the forests start to fall." },
+    { date: "1492 – 1867", title: "Conquest and empire", detail: "About 90% of an estimated 60 million Indigenous Americans die within a century. 12.5 million Africans are shipped into slavery." },
+    { date: "1914 – 1945", title: "Industrial war", detail: "Two world wars. WWII alone: an estimated 60–75 million dead, about 3% of everyone alive." },
+    { date: "Today", title: "The power to end it all", detail: "12,187 nuclear warheads. Monitored wildlife populations down an average of 73% since 1970." }
+  ];
+  const SHORT = ["300K YEARS AGO", "50K–10K YEARS AGO", "13,400 YEARS AGO", "1492–1867", "1914–1945", "TODAY"];
+  const FOREST = [100, 100, 97, 85, 80, 67];      // % of post-Ice Age forest remaining (endpoints: Our World in Data)
+  const HUMAN_MARKS = [0, 0, 14, 48, 110, 40];
+  const FELL = [0, 0, .12, .35, .5, .62];
+  const marchData = (() => {
+    let s3 = 17;
+    const r3 = () => { s3 = (s3 * 16807) % 2147483647; return (s3 - 1) / 2147483646; };
+    const crosses = [], trees = [], beasts = [];
+    HUMAN_MARKS.forEach((n, e) => {
+      for (let k = 0; k < n; k++) crosses.push({ e, x: e * ERA_W + (r3() - .5) * 1040, y: 560 + r3() * 80, d: r3() });
+    });
+    for (let x = -620; x <= 6150; x += 64) {
+      const e = Math.max(0, Math.min(5, Math.round(x / ERA_W)));
+      trees.push({ x: x + (r3() - .5) * 30, e, felled: r3() < FELL[e], h: 26 + r3() * 14, d: r3() });
+    }
+    [-330, -110, 140, 360].forEach(dx => beasts.push({ x: ERA_W + dx }));
+    return { crosses, trees, beasts };
+  })();
+
+  function march(t, now) {
+    const M = MARCH_MARKS;
+    // walking progress into each era
+    const walk = [1, ...[1, 2, 3, 4, 5].map(k => seg(t, M[k - 1], M[k - 1] + 2.2))];
+    const costP = [0, ...[1, 2, 3, 4, 5].map(k => seg(t, M[k - 1] + 2.3, M[k - 1] + 3.4))];
+    let camX = 0; for (let k = 1; k <= 5; k++) camX += walk[k] * ERA_W;
+    const z = seg(t, M[5] + .3, M[5] + 2.8);
+    const fitS = 1420 / (5 * ERA_W + 900);
+    const S = lerp(1, fitS, z), Sv = lerp(1, .55, z);
+    const cx = lerp(camX, 2.5 * ERA_W, z);
+    const P = (wx, wy) => [800 + (wx - cx) * S, ROAD_Y + (wy - ROAD_Y) * Sv];
+    const reveal = seg(t, 0, 1.4);
+    const moving = [1, 2, 3, 4, 5].some(k => t > M[k - 1] && t < M[k - 1] + 2.2);
+    const figWX = camX;
+
+    // forests (life cost)
+    for (const tr of marchData.trees) {
+      const [x, y] = P(tr.x, 760);
+      if (x < -40 || x > W + 40) continue;
+      const gone = tr.felled && tr.e >= 2 && costP[tr.e] > tr.d;
+      const sz = lerp(1, .7, z);
+      ctx.save();
+      ctx.globalAlpha = reveal * (gone ? .55 : .8);
+      if (gone) {
+        ctx.strokeStyle = C.muted; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(x - 5, y); ctx.lineTo(x + 5, y); ctx.moveTo(x, y); ctx.lineTo(x, y - 6); ctx.stroke();
+      } else {
+        ctx.fillStyle = hexA(GREEN, .55); ctx.strokeStyle = GREEN; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(x, y - tr.h * sz); ctx.lineTo(x - 10 * sz, y); ctx.lineTo(x + 10 * sz, y); ctx.closePath(); ctx.fill(); ctx.stroke();
+      }
+      ctx.restore();
+    }
+    // megafauna that vanish as we arrive
+    for (const b of marchData.beasts) {
+      const [x, y] = P(b.x, 690);
+      if (x < -60 || x > W + 60) continue;
+      icon("animal", x, y, reveal * lerp(.9, .18, costP[1]));
+    }
+
+    // human cost
+    ctx.save();
+    ctx.strokeStyle = CRIMSON; ctx.lineWidth = 2.4; ctx.lineCap = "round";
+    for (const c of marchData.crosses) {
+      const a = clamp((costP[c.e] - c.d * .7) / .3);
+      if (a <= 0) continue;
+      const [x, y] = P(c.x, c.y);
+      if (x < -10 || x > W + 10) continue;
+      const r = lerp(6, 3.5, z);
+      ctx.globalAlpha = a * .85;
+      ctx.beginPath(); ctx.moveTo(x - r, y - r); ctx.lineTo(x + r, y + r); ctx.moveTo(x + r, y - r); ctx.lineTo(x - r, y + r); ctx.stroke();
+    }
+    ctx.restore();
+
+    // the road, and the part already walked
+    const [r0x] = P(-700, ROAD_Y), [r1x] = P(6200, ROAD_Y), [fx] = P(figWX, ROAD_Y);
+    ctx.save();
+    ctx.globalAlpha = reveal;
+    ctx.strokeStyle = hexA(C.muted, .5); ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(r0x, ROAD_Y); ctx.lineTo(lerp(r0x, r1x, reveal), ROAD_Y); ctx.stroke();
+    ctx.strokeStyle = C.instinct; ctx.lineWidth = 4; ctx.shadowColor = C.instinct; ctx.shadowBlur = 14;
+    ctx.beginPath(); ctx.moveTo(r0x, ROAD_Y); ctx.lineTo(fx, ROAD_Y); ctx.stroke();
+    ctx.restore();
+
+    // era markers on the road
+    ERAS.forEach((e, i) => {
+      const [x] = P(i * ERA_W, ROAD_Y);
+      const seen = i === 0 ? reveal : seg(t, M[i - 1] + 1.6, M[i - 1] + 2.4);
+      if (seen <= 0) return;
+      ctx.save();
+      ctx.globalAlpha = seen;
+      ctx.fillStyle = C.ink; ctx.strokeStyle = C.instinct; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(x, ROAD_Y, 9, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.restore();
+      label(SHORT[i], x, ROAD_Y + 20, C.instinct, seen * z, "center", 12);
+    });
+
+    // era cards
+    ERAS.forEach((e, i) => {
+      const inA = i === 0 ? seg(t, .8, 1.8) : seg(t, M[i - 1] + 1.8, M[i - 1] + 2.6);
+      const outA = i < 5 ? 1 - seg(t, M[i], M[i] + 1.0) : 1;
+      const a = inA * outA * (1 - z);
+      if (a <= .01) return;
+      const [x] = P(i * ERA_W, ROAD_Y);
+      ctx.save();
+      ctx.globalAlpha = a;
+      ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+      ctx.font = `500 20px ${F.mono}`; setSpacing(3);
+      ctx.fillStyle = C.instinct;
+      ctx.fillText(e.date.toUpperCase(), x, 170);
+      setSpacing(0);
+      ctx.font = `400 54px ${F.display}`; ctx.fillStyle = C.text;
+      ctx.fillText(e.title, x, 236);
+      ctx.font = `400 25px ${BODY}`; ctx.fillStyle = hexA(C.text, .78);
+      wrapCenter(e.detail, x, 288, 760, 36);
+      ctx.restore();
+    });
+
+    // the walker
+    const bob = moving ? Math.abs(Math.sin(now * .012)) * 5 : 0;
+    drawPerson(fx, ROAD_Y - 62 - bob, lerp(1.2, .7, z), seg(t, .3, 1.2), C.text, 2.4);
+
+    // band labels (fixed to the left edge)
+    const [, hy] = P(0, 605), [, ly] = P(0, 740);
+    pill("HUMAN COST", 30, hy, CRIMSON, seg(t, M[1] + 2.3, M[1] + 3), "left", 14);
+    pill("LIFE COST", 30, ly - 40 * Sv, GREEN, seg(t, M[0] + 2.3, M[0] + 3), "left", 14);
+
+    // forest meter
+    let fv = FOREST[0];
+    for (let k = 1; k <= 5; k++) fv = lerp(fv, FOREST[k], costP[k]);
+    const ma = seg(t, M[1] + 2.3, M[1] + 3);
+    if (ma > 0) {
+      ctx.save();
+      ctx.globalAlpha = ma;
+      const mx = 1150, my = 60, mw = 390;
+      ctx.font = `500 14px ${F.mono}`; setSpacing(2.5); ctx.fillStyle = C.muted; ctx.textAlign = "left"; ctx.textBaseline = "middle";
+      ctx.fillText("FORESTS REMAINING SINCE THE ICE AGE", mx, my);
+      setSpacing(0);
+      ctx.strokeStyle = hexA(GREEN, .5); ctx.lineWidth = 1;
+      ctx.strokeRect(mx, my + 18, mw, 16);
+      ctx.fillStyle = hexA(GREEN, .8);
+      ctx.fillRect(mx + 2, my + 20, (mw - 4) * fv / 100, 12);
+      ctx.font = `500 26px ${F.mono}`; ctx.fillStyle = GREEN; ctx.textAlign = "right";
+      ctx.fillText(Math.round(fv) + "%", mx + mw, my + 58);
+      ctx.restore();
+    }
+
+    // zoomed-out ending
+    if (z > 0) {
+      ctx.save();
+      ctx.globalAlpha = seg(t, M[5] + 1.6, M[5] + 3);
+      ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+      ctx.font = `400 60px ${F.display}`; ctx.fillStyle = C.text;
+      ctx.fillText("300,000 years. One road.", 800, 210);
+      ctx.font = `400 26px ${BODY}`; ctx.fillStyle = hexA(C.text, .75);
+      ctx.fillText("Paid for by other people, and by every other kind of life.", 800, 262);
+      ctx.font = `400 15px ${F.mono}`; ctx.fillStyle = C.muted; setSpacing(2);
+      ctx.fillText("ERAS EVENLY SPACED · NOT TO SCALE", 800, 860);
+      ctx.restore();
+    }
+  }
+
+  function wrapCenter(text, x, y, maxW, lh) {
+    const words = text.split(" ");
+    let line = "", yy = y;
+    for (const w of words) {
+      const test = line ? line + " " + w : w;
+      if (ctx.measureText(test).width > maxW && line) { ctx.fillText(line, x, yy); line = w; yy += lh; }
+      else line = test;
+    }
+    if (line) ctx.fillText(line, x, yy);
+  }
+
+  const SCENES = {
+    march: {
+      draw: march,
+      marks: MARCH_MARKS,
+      beats: [
+        { k: "300,000 years ago", v: "We appear." },
+        { k: "50,000 – 10,000 years ago", v: "We spread." },
+        { k: "13,400 years ago", v: "The first evidence of war." },
+        { k: "1492 – 1867", v: "Conquest and empire." },
+        { k: "1914 – 1945", v: "Industrial war." },
+        { k: "Today", v: "The power to end it all." },
+        { k: "Zoom out", v: "300,000 years. One road." }
+      ]
+    },
+    fission: {
+      draw: fission,
+      marks: [2.2, 7.4, 14],
+      beats: [
+        { k: "Berlin · December 1938", v: "Hahn and Strassmann fire neutrons at uranium.", warm: true },
+        { k: "Fission", v: "The nucleus splits: two lighter elements, spare neutrons, and a burst of energy.", warm: true },
+        { k: "Chain reaction", v: "Each split triggers more. Controlled, it's a reactor. Uncontrolled, it's a bomb.", warm: true }
+      ]
+    },
+    levels: {
+      draw: levels,
+      marks: [3.5, 8, 14.6, 16.4],
+      beats: [
+        { k: "Level 1 · rooted in fear", v: "Survive. Protect the self. Keep offspring alive.", warm: true },
+        { k: "Soul/Spirit", v: "It wakes, reaches out, and starts to steer." },
+        { k: "Level 2 · rooted in love", v: "Purpose, family, community, society, the planet." },
+        { k: "Both at once", v: "Level 1 keeps running on autopilot. Level 2 takes the wheel." }
+      ]
+    },
+    soul: {
+      draw: soul,
+      marks: [6.6, 13.8, 17.8, 22.0],
+      beats: [
+        { k: "The common view", v: "One whole soul, one life at a time." },
+        { k: "The soul holon model", v: "The higher self is a whole made of wholes. Each holon it releases is complete, only smaller." },
+        { k: "Incarnation", v: "Holons enter every expression of life, and many enter human lives." },
+        { k: "Reporting back", v: "Many lives at once. Each holon is whole in itself and part of a larger whole." }
+      ]
+    }
+  };
+
+  window.SCENES = SCENES;
+  window.SceneKit = {
+    // Draw one scene frame into a canvas whose pixel size already matches the 1920x1080 stage.
+    render(c2d, key, t, now, opts) {
+      ctx = c2d;
+      captionsOn = !opts || opts.captions !== false;
+      const cv = c2d.canvas;
+      c2d.setTransform(1, 0, 0, 1, 0, 0);
+      c2d.clearRect(0, 0, cv.width, cv.height);
+      const s = cv.width / W;
+      c2d.setTransform(s, 0, 0, cv.height / H, 0, 0);
+      const sc = SCENES[key];
+      sc.draw(t, now);
+      caption(sc, t);
+    }
+  };
+})();
+
+</script>
+<script>
+(() => {
+  const SCENES = window.SCENES, Kit = window.SceneKit;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const W = 1600, H = 900;
+
+  const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
+  const sv = document.getElementById("stars"), sctx = sv.getContext("2d");
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    for (const c of [cv, sv]) {
+      c.width = Math.max(1, Math.round(c.clientWidth * dpr));
+      c.height = Math.max(1, Math.round(c.clientHeight * dpr));
+    }
+  }
+  new ResizeObserver(resize).observe(cv);
+  resize();
+  const smallStage = () => cv.clientWidth < 640;
+
+  let seed = 7;
+  const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  const stars = Array.from({ length: 170 }, () => ({ x: rnd() * W, y: rnd() * H, r: rnd() * 1.4 + .3, a: rnd() * .5 + .15, sp: rnd() * 1.5 + .4, ph: rnd() * 6.3 }));
+  function drawStars(now) {
+    sctx.setTransform(sv.width / W, 0, 0, sv.height / H, 0, 0);
+    sctx.clearRect(0, 0, W, H);
+    for (const s of stars) {
+      const a = s.a * (.65 + .35 * Math.sin(now * .001 * s.sp + s.ph));
+      sctx.fillStyle = `rgba(235,232,243,${a})`;
+      sctx.beginPath(); sctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); sctx.fill();
+    }
+  }
+
+  let sceneKey = "soul";
+  let t = SCENES.soul.marks[0], target = t;
+  let captionsOn = true;
+  let last = performance.now();
+
+  const cuesEl = document.getElementById("cues");
+  const nowcap = document.getElementById("nowcap");
+  const nowK = document.getElementById("nowcap-k"), nowV = document.getElementById("nowcap-v");
+  function buildCues() {
+    cuesEl.innerHTML = "";
+    SCENES[sceneKey].beats.forEach((b, i) => {
+      const el = document.createElement("button");
+      el.className = "cue";
+      el.innerHTML = `<span class="k"></span><span class="v"></span>`;
+      el.querySelector(".k").textContent = `Beat ${i + 1} · ${b.k}`;
+      el.querySelector(".v").textContent = b.v;
+      el.addEventListener("click", () => jumpTo(i));
+      cuesEl.appendChild(el);
+    });
+    updateUI();
+  }
+  function beatIndex() {
+    const m = SCENES[sceneKey].marks;
+    const i = m.findIndex(x => target <= x + 0.001);
+    return i < 0 ? m.length - 1 : i;
+  }
+  function updateUI() {
+    const i = beatIndex(), m = SCENES[sceneKey].marks;
+    [...cuesEl.children].forEach((el, k) => { if (k === i) el.setAttribute("aria-current", "step"); else el.removeAttribute("aria-current"); });
+    document.getElementById("next").disabled = target >= m[m.length - 1] - 0.001;
+    document.getElementById("back").disabled = target <= m[0] + 0.001;
+    const b = SCENES[sceneKey].beats[i];
+    nowK.textContent = `Beat ${i + 1} · ${b.k}`;
+    nowK.classList.toggle("warm", !!b.warm);
+    nowV.textContent = b.v;
+    nowcap.hidden = !captionsOn;
+  }
+  function next() {
+    const m = SCENES[sceneKey].marks;
+    const n = m.find(x => x > target + 0.001);
+    if (n === undefined) return;
+    if (t < target) t = target;
+    target = n;
+    if (reduce) t = target;
+    updateUI();
+  }
+  function back() {
+    const m = SCENES[sceneKey].marks;
+    const prev = [...m].reverse().find(x => x < target - 0.001);
+    if (prev === undefined) return;
+    t = target = prev;
+    updateUI();
+  }
+  function jumpTo(i) {
+    const m = SCENES[sceneKey].marks;
+    if (i === 0) { t = 0; target = m[0]; } else { t = m[i - 1]; target = m[i]; }
+    if (reduce) t = target;
+    updateUI();
+  }
+  function playAll() {
+    const m = SCENES[sceneKey].marks;
+    t = 0; target = m[m.length - 1];
+    if (reduce) t = target;
+    updateUI();
+  }
+  function setScene(key) {
+    sceneKey = key;
+    document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", String(b.dataset.scene === key)));
+    t = target = SCENES[key].marks[0];
+    if (!reduce) t = 0;
+    buildCues();
+  }
+
+  document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => setScene(b.dataset.scene)));
+  document.getElementById("next").addEventListener("click", next);
+  document.getElementById("back").addEventListener("click", back);
+  document.getElementById("restart").addEventListener("click", () => jumpTo(0));
+  document.getElementById("playall").addEventListener("click", playAll);
+  document.getElementById("captions").addEventListener("change", e => { captionsOn = e.target.checked; updateUI(); });
+  const stage = document.getElementById("stage");
+  function fullscreen() {
+    try {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else if (stage.requestFullscreen) stage.requestFullscreen().catch(() => {});
+    } catch (e) {}
+  }
+  document.getElementById("fs").addEventListener("click", fullscreen);
+  stage.addEventListener("click", next);
+  window.addEventListener("keydown", e => {
+    if (e.target.closest && e.target.closest("input")) return;
+    const k = e.key;
+    if (k === "ArrowRight" || k === " " || k === "PageDown") { e.preventDefault(); next(); }
+    else if (k === "ArrowLeft" || k === "PageUp") { e.preventDefault(); back(); }
+    else if (k === "r" || k === "R") jumpTo(0);
+    else if (k === "f" || k === "F") fullscreen();
+    else if (k === "1") setScene("soul");
+    else if (k === "2") setScene("levels");
+  });
+
+  function frame(now) {
+    const dt = Math.min(.05, (now - last) / 1000);
+    last = now;
+    if (t < target) t = Math.min(target, t + dt);
+    drawStars(reduce ? 0 : now);
+    Kit.render(ctx, sceneKey, t, reduce ? 0 : now, { captions: captionsOn && !smallStage() });
+    requestAnimationFrame(frame);
+  }
+
+  buildCues();
+  const startLoop = () => { last = performance.now(); requestAnimationFrame(frame); };
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(startLoop, startLoop); else startLoop();
+})();
+</script>
+</body>
+</html>
